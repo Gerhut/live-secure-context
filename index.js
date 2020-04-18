@@ -1,35 +1,32 @@
-function change_cert(server,keypath,certpath)
-{
-    const fs = require('fs');
-    const filepath = './';
-    const options = {
-        key: fs.readFileSync(keypath), //钥匙
-        cert: fs.readFileSync(certpath) //证书
-      };
-    console.log(`正在监听 ${filepath}`);
+const fs = require('fs')
 
-    fs.watch(filepath, (eventType, filename) =>
-    {
-        console.log(`event type is: ${eventType}`);
-        if (filename)
-        {
-          console.log(` ${filename}文件发生更新`);
-        }
-        else
-        {
-          console.log('filename not provided');
-        }
-        if(eventType='change')
-        {
-            setTimeout(function(){
-                server.setSecureContext(options);
-            },5000);
-            console.log('证书已更新完成');
-        }
-        else{
-            console.log('未发生更新');
-        }
-    });
-
+function changecert (server, keypath, certpath) {
+  var option = {}
+  const result1 = 'key'
+  const result2 = 'cert'
+  watchfile(keypath, option, result1, certpath, server)
+  watchfile(certpath, option, result2, keypath, server)
 }
-module.exports=change_cert;
+
+function watchfile (filepath, option, result, otherpath, server) {
+  fs.watch(filepath, (eventType, filename) => {
+    if (eventType === 'change') {
+      if (result === 'key') {
+        option = {
+          key: fs.readFileSync(filepath),
+          cert: fs.readFileSync(otherpath)
+        }
+      } else if (result === 'cert') {
+        option = {
+          key: fs.readFileSync(otherpath),
+          cert: fs.readFileSync(filepath)
+        }
+      }
+      try {
+        server.setSecureContext(option)
+      } catch {
+      }
+    }
+  })
+}
+module.exports = changecert
