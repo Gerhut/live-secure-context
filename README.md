@@ -6,20 +6,25 @@ Live reload the secure context from file, like private keys and certificates.
 
 ```JavaScript
 const https = require('https')
-const path = require('path')
-const liveSecureContext = require('live-secure-context')
+const fs = require('fs')
+const changecert = require('live-secure-context')
 
-const server = https.createServer((req, res) => {
-  res.writeHead(200)
-  res.end('hello  world\n')
+const keypath = './key.pem'
+const certpath = './cert.pem'
+const options = {
+  key: fs.readFileSync(keypath),
+  cert: fs.readFileSync(certpath)
+}
+
+const server = https.createServer(options, (req, res) => {
+  res.statusCode = 200
+  res.setHeader('Content-Type', 'text/plain')
+  res.end('Hello World')
 })
 
-liveSecureContext(server, {
-  key: 'key.pem',
-  cert: 'cert.pem'
-})
+server.listen(port, hostname)
 
-server.listen(8443)
+changecert(server, keypath, certpath)
 ```
 
 ## Development
