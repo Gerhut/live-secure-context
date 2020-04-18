@@ -1,3 +1,4 @@
+var expect = require('chai').expect
 const https = require('https')
 const fs = require('fs')
 const changecert = require('./index.js')
@@ -22,4 +23,8 @@ server.listen(port, hostname, () => {
   console.log(`Server running at https://${hostname}:${port}/`)
 })
 
-changecert(server, keypath, certpath)
+describe('替换证书的测试', function () {
+  it('传递证书路径后替换证书', function () {
+    expect(changecert(server, keypath, certpath)).to.be.equal(1)
+  })
+})
